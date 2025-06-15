@@ -20,7 +20,7 @@ export default function CollegeERPPortal() {
       <BubbleAnimations />
       <div className="absolute inset-0 bg-grid-slate-200/20 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.5))]" />
 
-      <div className="relative min-h-screen flex">
+      <div className="relative min-h-screen flex flex-col lg:flex-row">
         {/* Left Side - College Image */}
         <motion.div
           initial={{ x: -50, opacity: 0 }}
@@ -29,7 +29,7 @@ export default function CollegeERPPortal() {
             duration: 1,
             ease: [0.25, 0.46, 0.45, 0.94],
           }}
-          className="hidden lg:flex lg:w-1/2 relative"
+          className="flex w-full h-40 sm:h-48 md:h-56 lg:w-1/2 lg:h-auto relative order-first lg:order-none"
         >
           <div className="relative w-full h-full">
             <motion.div
@@ -43,23 +43,24 @@ export default function CollegeERPPortal() {
                 ease: [0.4, 0, 0.6, 1],
               }}
             />
-            <div className="absolute right-0 top-0 h-full w-8 bg-gradient-to-r from-transparent to-slate-50 z-20" />
+            <div className="absolute right-0 top-0 h-full w-8 bg-gradient-to-r from-transparent to-slate-50 z-20 hidden lg:block" />
+            <div className="absolute bottom-0 left-0 w-full h-8 bg-gradient-to-t from-slate-50 to-transparent z-20 block lg:hidden" />
             <div className="relative w-full h-full overflow-hidden">
               <Image
                 src="https://ik.imagekit.io/kfeapecpv/Screenshot%202025-06-15%20110729.jpg?updatedAt=1749966299413"
                 alt="Loyola ICAM College of Engineering and Technology"
                 fill
-                className="object-cover object-center"
+                className="object-cover object-top lg:object-center"
                 priority
                 quality={90}
-                sizes="50vw"
+                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 100vw, 50vw"
               />
             </div>
           </div>
         </motion.div>
 
         {/* Right Side - Login Content */}
-        <div className="flex-1 flex items-center justify-center p-6 lg:p-12 relative">
+        <div className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-12 relative min-h-screen lg:min-h-auto order-last lg:order-none">
           {/* Creative Background Elements for Right Side */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
             {/* Geometric Grid Pattern */}
