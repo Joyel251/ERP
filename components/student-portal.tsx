@@ -17,6 +17,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import {
   LogOut,
   Home,
@@ -32,6 +33,7 @@ import {
   AlertTriangle,
   Bell,
   Edit,
+  X,
 } from "lucide-react"
 import { getStudentData, type Student } from "@/lib/student-data"
 import StudentProfile from "@/components/student-sections/student-profile"
@@ -234,14 +236,14 @@ export default function StudentPortal({ registrationNumber, onLogout }: StudentP
 
   if (!student) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50 p-4">
         <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center">
           <motion.div
-            className="animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent mx-auto mb-4"
+            className="animate-spin rounded-full h-12 w-12 sm:h-16 sm:w-16 border-4 border-blue-600 border-t-transparent mx-auto mb-4"
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
           />
-          <p className="text-slate-600 font-medium">Loading your portal...</p>
+          <p className="text-slate-600 font-medium text-sm sm:text-base">Loading your portal...</p>
         </motion.div>
       </div>
     )
@@ -257,10 +259,10 @@ export default function StudentPortal({ registrationNumber, onLogout }: StudentP
           onSectionChange={handleSectionChange}
           onLogout={onLogout}
         />
-        <div className="flex-1 flex flex-col min-h-screen">
+        <div className="flex-1 flex flex-col min-h-screen w-full">
           <Header student={student} activeSection={activeSection} />
           <div ref={mainContentRef} className="flex-1 overflow-auto" style={{ scrollBehavior: "auto" }}>
-            <div className="p-8 max-w-7xl mx-auto">
+            <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={activeSection}
@@ -302,7 +304,7 @@ function AppSidebar({
   onSectionChange: (section: ActiveSection) => void
   onLogout: () => void
 }) {
-  const { state } = useSidebar()
+  const { state, isMobile, setOpen } = useSidebar()
 
   const categories = {
     main: "Overview",
@@ -313,14 +315,22 @@ function AppSidebar({
     system: "System",
   }
 
+  const handleMenuItemClick = (section: ActiveSection) => {
+    onSectionChange(section)
+    // Close sidebar on mobile after selecting an item
+    if (isMobile) {
+      setOpen(false)
+    }
+  }
+
   return (
     <motion.div initial={{ x: -300 }} animate={{ x: 0 }} transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}>
       <Sidebar
         collapsible="icon"
-        className="border-r-2 border-slate-200/60 shadow-2xl z-50 fixed left-0 top-0 h-full"
+        className="border-r-2 border-slate-200/60 shadow-2xl z-50"
         style={
           {
-            "--sidebar-width": "16rem",
+            "--sidebar-width": isMobile ? "18rem" : "16rem",
             "--sidebar-width-icon": "4rem",
           } as React.CSSProperties
         }
@@ -328,24 +338,24 @@ function AppSidebar({
         {/* Header */}
         <SidebarHeader className="border-b-2 border-slate-200/60 bg-gradient-to-br from-white to-slate-50/50">
           <motion.div
-            className="px-4 py-4"
+            className="px-3 sm:px-4 py-3 sm:py-4"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            {/* College Info */}
-            <div className="flex items-center justify-center group-data-[collapsible=icon]:justify-center mb-4">
-              <div className="flex items-center gap-3">
+            {/* Mobile Close Button and College Info */}
+            <div className="flex items-center justify-between group-data-[collapsible=icon]:justify-center mb-3 sm:mb-4">
+              <div className="flex items-center gap-2 sm:gap-3">
                 <motion.div
-                  className="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/25"
+                  className="h-8 w-8 sm:h-10 sm:w-10 rounded-xl bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/25"
                   whileHover={{ scale: 1.05, rotate: 5 }}
                   transition={{ type: "spring", stiffness: 400, damping: 17 }}
                 >
-                  <GraduationCap className="h-5 w-5 text-white" />
+                  <GraduationCap className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
                 </motion.div>
                 <div className="group-data-[collapsible=icon]:hidden">
                   <motion.h1
-                    className="font-bold text-lg text-slate-800 title-font"
+                    className="font-bold text-base sm:text-lg text-slate-800 title-font"
                     animate={{ opacity: state === "expanded" ? 1 : 0 }}
                     transition={{ duration: 0.3 }}
                   >
@@ -360,6 +370,26 @@ function AppSidebar({
                   </motion.p>
                 </div>
               </div>
+
+              {/* Mobile Close Button - Only show on mobile when sidebar is expanded */}
+              {isMobile && state === "expanded" && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.3 }}
+                  className="group-data-[collapsible=icon]:hidden"
+                >
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setOpen(false)}
+                    className="h-8 w-8 p-0 hover:bg-slate-100 rounded-lg transition-colors"
+                  >
+                    <X className="h-4 w-4 text-slate-600" />
+                    <span className="sr-only">Close sidebar</span>
+                  </Button>
+                </motion.div>
+              )}
             </div>
 
             {/* Student Info Card */}
@@ -369,7 +399,7 @@ function AppSidebar({
               transition={{ duration: 0.3 }}
             >
               <motion.div
-                className="relative p-3 rounded-xl bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 border-2 border-blue-100/60 overflow-hidden"
+                className="relative p-2 sm:p-3 rounded-xl bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 border-2 border-blue-100/60 overflow-hidden"
                 whileHover={{ scale: 1.02 }}
                 transition={{ type: "spring", stiffness: 400, damping: 17 }}
               >
@@ -386,13 +416,13 @@ function AppSidebar({
                   }}
                 />
 
-                <div className="relative flex items-center gap-3">
+                <div className="relative flex items-center gap-2 sm:gap-3">
                   <motion.div
-                    className="h-12 w-12 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg"
+                    className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg"
                     whileHover={{ rotate: 10 }}
                     transition={{ type: "spring", stiffness: 400, damping: 17 }}
                   >
-                    <span className="text-white font-bold text-sm">
+                    <span className="text-white font-bold text-xs sm:text-sm">
                       {student.name
                         .split(" ")
                         .map((n) => n[0])
@@ -403,7 +433,7 @@ function AppSidebar({
                   <div className="flex-1 min-w-0">
                     {/* Separate animation for student name */}
                     <motion.p
-                      className="font-semibold text-slate-800 text-sm truncate"
+                      className="font-semibold text-slate-800 text-xs sm:text-sm truncate"
                       animate={{
                         color: ["#1e293b", "#3b82f6", "#1e293b"],
                       }}
@@ -418,7 +448,7 @@ function AppSidebar({
                     <p className="text-slate-500 text-xs truncate">{student.registrationNumber}</p>
                     <div className="flex items-center gap-1 mt-1">
                       <motion.div
-                        className="h-2 w-2 rounded-full bg-green-500"
+                        className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-green-500"
                         animate={{ scale: [1, 1.2, 1] }}
                         transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
                       />
@@ -432,7 +462,7 @@ function AppSidebar({
         </SidebarHeader>
 
         {/* Navigation Menu */}
-        <SidebarContent className="bg-white px-2 py-3">
+        <SidebarContent className="bg-white px-1 sm:px-2 py-2 sm:py-3">
           {Object.entries(categories).map(([categoryKey, categoryLabel], categoryIndex) => {
             const categoryItems = menuItems.filter((item) => item.category === categoryKey)
             if (categoryItems.length === 0) return null
@@ -443,10 +473,10 @@ function AppSidebar({
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.4, delay: categoryIndex * 0.1 }}
-                className="mb-6"
+                className="mb-4 sm:mb-6"
               >
                 <motion.div
-                  className="px-3 mb-2 group-data-[collapsible=icon]:hidden"
+                  className="px-2 sm:px-3 mb-1 sm:mb-2 group-data-[collapsible=icon]:hidden"
                   animate={{ opacity: state === "expanded" ? 1 : 0 }}
                   transition={{ duration: 0.3 }}
                 >
@@ -468,7 +498,7 @@ function AppSidebar({
                       <SidebarMenuItem>
                         <motion.div
                           whileHover={{
-                            x: 4,
+                            x: isMobile ? 2 : 4,
                             scale: 1.02,
                           }}
                           whileTap={{ scale: 0.98 }}
@@ -477,8 +507,8 @@ function AppSidebar({
                         >
                           <SidebarMenuButton
                             isActive={activeSection === item.id}
-                            onClick={() => onSectionChange(item.id as ActiveSection)}
-                            className={`w-full justify-start transition-all duration-300 rounded-xl mb-1 h-12 relative overflow-hidden group ${
+                            onClick={() => handleMenuItemClick(item.id as ActiveSection)}
+                            className={`w-full justify-start transition-all duration-300 rounded-xl mb-1 h-10 sm:h-12 relative overflow-hidden group ${
                               activeSection === item.id
                                 ? `bg-gradient-to-r ${item.gradient} text-white shadow-lg shadow-${item.gradient.split("-")[1]}-500/25`
                                 : `text-slate-700 ${item.hoverColor} hover:shadow-md`
@@ -505,12 +535,12 @@ function AppSidebar({
                                 rotate: activeSection === item.id ? 5 : 0,
                               }}
                               transition={{ duration: 0.2 }}
-                              className="flex items-center justify-center relative z-10 min-w-[20px]"
+                              className="flex items-center justify-center relative z-10 min-w-[16px] sm:min-w-[20px]"
                             >
-                              <item.icon className="h-5 w-5" />
+                              <item.icon className="h-4 w-4 sm:h-5 sm:w-5" />
                             </motion.div>
 
-                            <span className="font-medium text-sm relative z-10 group-data-[collapsible=icon]:hidden">
+                            <span className="font-medium text-xs sm:text-sm relative z-10 group-data-[collapsible=icon]:hidden truncate">
                               {item.label}
                             </span>
 
@@ -521,7 +551,7 @@ function AppSidebar({
                                 animate={{ scale: 1 }}
                                 className="ml-auto relative z-10"
                               >
-                                <Edit className="h-4 w-4 text-slate-500" />
+                                <Edit className="h-3 w-3 sm:h-4 sm:w-4 text-slate-500" />
                               </motion.div>
                             )}
 
@@ -533,7 +563,7 @@ function AppSidebar({
                                 className="ml-auto relative z-10"
                               >
                                 <motion.div
-                                  className={`h-5 w-5 rounded-full flex items-center justify-center text-xs font-bold ${
+                                  className={`h-4 w-4 sm:h-5 sm:w-5 rounded-full flex items-center justify-center text-xs font-bold ${
                                     activeSection === item.id ? "bg-white/20 text-white" : "bg-red-500 text-white"
                                   }`}
                                   animate={{ scale: [1, 1.2, 1] }}
@@ -568,7 +598,7 @@ function AppSidebar({
                               className="absolute -top-1 -right-1 z-30"
                             >
                               <motion.div
-                                className="h-3 w-3 rounded-full bg-red-500 border-2 border-white shadow-sm"
+                                className="h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full bg-red-500 border-2 border-white shadow-sm"
                                 animate={{
                                   scale: [1, 1.2, 1],
                                   opacity: [0.8, 1, 0.8],
@@ -592,7 +622,7 @@ function AppSidebar({
         </SidebarContent>
 
         {/* Footer */}
-        <SidebarFooter className="border-t-2 border-slate-200/60 bg-gradient-to-br from-white to-slate-50/50 p-2">
+        <SidebarFooter className="border-t-2 border-slate-200/60 bg-gradient-to-br from-white to-slate-50/50 p-1 sm:p-2">
           <SidebarMenu>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -607,16 +637,18 @@ function AppSidebar({
                 >
                   <SidebarMenuButton
                     onClick={onLogout}
-                    className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50 transition-all duration-300 font-medium rounded-xl h-12 group relative overflow-hidden"
+                    className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50 transition-all duration-300 font-medium rounded-xl h-10 sm:h-12 group relative overflow-hidden"
                   >
                     <motion.div
                       className="absolute inset-0 bg-gradient-to-r from-red-400/10 to-red-600/10 opacity-0 group-hover:opacity-100"
                       transition={{ duration: 0.3 }}
                     />
-                    <motion.div whileHover={{ rotate: 10 }} className="relative z-10 min-w-[20px]">
-                      <LogOut className="h-5 w-5" />
+                    <motion.div whileHover={{ rotate: 10 }} className="relative z-10 min-w-[16px] sm:min-w-[20px]">
+                      <LogOut className="h-4 w-4 sm:h-5 sm:w-5" />
                     </motion.div>
-                    <span className="relative z-10 group-data-[collapsible=icon]:hidden">Sign Out</span>
+                    <span className="relative z-10 group-data-[collapsible=icon]:hidden text-xs sm:text-sm">
+                      Sign Out
+                    </span>
                   </SidebarMenuButton>
                 </motion.div>
               </SidebarMenuItem>
@@ -649,47 +681,47 @@ function Header({ student, activeSection }: { student: Student; activeSection: A
 
   return (
     <header className="sticky top-0 z-40 border-b-2 border-slate-200/60 bg-white/95 backdrop-blur-sm shadow-sm">
-      <div className="flex items-center justify-between px-8 py-6">
-        <div className="flex items-center gap-6">
+      <div className="flex items-center justify-between px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+        <div className="flex items-center gap-3 sm:gap-6 min-w-0 flex-1">
           <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-            <SidebarTrigger className="hover:bg-blue-50 hover:text-blue-600 transition-colors h-10 w-10 rounded-xl shadow-md border-2 border-slate-200" />
+            <SidebarTrigger className="hover:bg-blue-50 hover:text-blue-600 transition-colors h-8 w-8 sm:h-10 sm:w-10 rounded-xl shadow-md border-2 border-slate-200" />
           </motion.div>
-          <div>
+          <div className="min-w-0 flex-1">
             <motion.h1
               key={activeSection}
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
-              className="text-2xl font-bold text-slate-800 title-font"
+              className="text-lg sm:text-xl lg:text-2xl font-bold text-slate-800 title-font truncate"
             >
               {getSectionTitle(activeSection)}
             </motion.h1>
-            <p className="text-slate-600 mt-1">
+            <p className="text-slate-600 mt-1 text-xs sm:text-sm truncate">
               {student.department} • Year {student.year} • Section {student.section}
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-6">
-          {/* Academic Year Badge */}
-          <Badge variant="outline" className="px-3 py-1 font-medium border-2">
+        <div className="flex items-center gap-2 sm:gap-4 lg:gap-6">
+          {/* Academic Year Badge - Hidden on mobile */}
+          <Badge variant="outline" className="px-2 sm:px-3 py-1 font-medium border-2 hidden sm:inline-flex text-xs">
             Academic Year 2024-25
           </Badge>
 
-          {/* Student Info */}
-          <div className="text-right">
-            <p className="text-sm font-semibold text-slate-800">{student.name}</p>
-            <p className="text-xs text-slate-500 font-medium">{student.registrationNumber}</p>
+          {/* Student Info - Responsive */}
+          <div className="text-right hidden md:block">
+            <p className="text-sm font-semibold text-slate-800 truncate max-w-32 lg:max-w-none">{student.name}</p>
+            <p className="text-xs text-slate-500 font-medium truncate">{student.registrationNumber}</p>
           </div>
 
           {/* Status Indicator */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2">
             <motion.div
-              className="h-2 w-2 rounded-full bg-green-500"
+              className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-green-500"
               animate={{ scale: [1, 1.2, 1] }}
               transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
             />
-            <span className="text-xs text-slate-600 font-medium">Online</span>
+            <span className="text-xs text-slate-600 font-medium hidden sm:inline">Online</span>
           </div>
         </div>
       </div>

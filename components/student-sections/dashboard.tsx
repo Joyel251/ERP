@@ -155,33 +155,35 @@ export default function Dashboard({ student }: DashboardProps) {
   ]
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       {/* Welcome Section */}
       <Card className="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white border shadow-xl">
-        <CardContent className="p-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-3xl font-bold mb-3 title-font">Welcome back, {student.name.split(" ")[0]}!</h2>
-              <p className="text-blue-100 mb-4 text-lg">
+        <CardContent className="p-4 sm:p-6 lg:p-8">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex-1">
+              <h2 className="text-2xl sm:text-3xl font-bold mb-2 sm:mb-3 title-font">
+                Welcome back, {student.name.split(" ")[0]}!
+              </h2>
+              <p className="text-blue-100 mb-3 sm:mb-4 text-base sm:text-lg">
                 {student.department} • Year {student.year} • Semester {student.semester}
               </p>
-              <div className="flex items-center gap-6 text-sm">
-                <span className="flex items-center gap-2 bg-white/20 px-3 py-1 rounded-full border border-white/20">
-                  <Users className="h-4 w-4" />
+              <div className="flex flex-wrap items-center gap-2 sm:gap-6 text-sm">
+                <span className="flex items-center gap-2 bg-white/20 px-2 sm:px-3 py-1 rounded-full border border-white/20">
+                  <Users className="h-3 w-3 sm:h-4 sm:w-4" />
                   Section {student.section}
                 </span>
-                <span className="flex items-center gap-2 bg-white/20 px-3 py-1 rounded-full border border-white/20">
-                  <GraduationCap className="h-4 w-4" />
+                <span className="flex items-center gap-2 bg-white/20 px-2 sm:px-3 py-1 rounded-full border border-white/20">
+                  <GraduationCap className="h-3 w-3 sm:h-4 sm:w-4" />
                   Roll No: {student.rollNumber}
                 </span>
               </div>
             </div>
             <div className="text-right">
-              <div className="text-5xl font-bold mb-2">{new Date().getDate()}</div>
-              <div className="text-blue-100">
+              <div className="text-3xl sm:text-5xl font-bold mb-1 sm:mb-2">{new Date().getDate()}</div>
+              <div className="text-blue-100 text-sm sm:text-base">
                 {new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" })}
               </div>
-              <div className="text-sm text-blue-200 mt-1">
+              <div className="text-xs sm:text-sm text-blue-200 mt-1">
                 {new Date().toLocaleDateString("en-US", { weekday: "long" })}
               </div>
             </div>
@@ -190,59 +192,59 @@ export default function Dashboard({ student }: DashboardProps) {
       </Card>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {quickStats.map((stat, index) => (
           <Card
             key={stat.title}
             className={`hover:shadow-lg transition-all duration-300 border ${stat.borderColor} hover:scale-105`}
           >
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className={`p-3 rounded-xl ${stat.bgColor} border ${stat.borderColor}`}>
-                  <stat.icon className={`h-6 w-6 ${stat.color}`} />
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex items-center justify-between mb-3 sm:mb-4">
+                <div className={`p-2 sm:p-3 rounded-xl ${stat.bgColor} border ${stat.borderColor}`}>
+                  <stat.icon className={`h-5 w-5 sm:h-6 sm:w-6 ${stat.color}`} />
                 </div>
                 <div className="text-right">
-                  <div className={`text-2xl font-bold ${stat.color}`}>{stat.value}</div>
+                  <div className={`text-xl sm:text-2xl font-bold ${stat.color}`}>{stat.value}</div>
                   <Badge variant="outline" className="text-xs mt-1">
                     {stat.status}
                   </Badge>
                 </div>
               </div>
-              <div className="space-y-3">
+              <div className="space-y-2 sm:space-y-3">
                 <div className="flex justify-between text-sm">
-                  <span className="text-slate-600 font-medium">{stat.title}</span>
+                  <span className="text-slate-600 font-medium truncate">{stat.title}</span>
                   <span className="text-slate-500">{stat.progress.toFixed(0)}%</span>
                 </div>
-                <Progress value={stat.progress} className="h-3" />
+                <Progress value={stat.progress} className="h-2 sm:h-3" />
               </div>
             </CardContent>
           </Card>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
         {/* Recent Activities */}
         <div className="lg:col-span-2">
           <Card className="shadow-lg border">
             <CardHeader className="border-b">
-              <CardTitle className="flex items-center gap-3">
-                <TrendingUp className="h-6 w-6 text-blue-600" />
+              <CardTitle className="flex items-center gap-3 text-lg sm:text-xl">
+                <TrendingUp className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600" />
                 Recent Academic Activities
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-6">
-              <div className="space-y-4">
+            <CardContent className="p-4 sm:p-6">
+              <div className="space-y-3 sm:space-y-4">
                 {recentActivities.map((activity, index) => (
                   <div
                     key={index}
-                    className="flex items-center gap-4 p-4 rounded-xl hover:bg-slate-50 transition-colors border"
+                    className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl hover:bg-slate-50 transition-colors border"
                   >
-                    <div className={`p-3 rounded-xl ${activity.bgColor} border`}>
-                      <activity.icon className={`h-5 w-5 ${activity.color}`} />
+                    <div className={`p-2 sm:p-3 rounded-xl ${activity.bgColor} border`}>
+                      <activity.icon className={`h-4 w-4 sm:h-5 sm:w-5 ${activity.color}`} />
                     </div>
-                    <div className="flex-1">
-                      <p className="font-semibold text-slate-800">{activity.title}</p>
-                      <p className="text-sm text-slate-500">{activity.time}</p>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-slate-800 text-sm sm:text-base truncate">{activity.title}</p>
+                      <p className="text-xs sm:text-sm text-slate-500">{activity.time}</p>
                     </div>
                   </div>
                 ))}
@@ -255,25 +257,25 @@ export default function Dashboard({ student }: DashboardProps) {
         <div>
           <Card className="shadow-lg border">
             <CardHeader className="border-b">
-              <CardTitle className="flex items-center gap-3">
-                <Bell className="h-6 w-6 text-orange-600" />
+              <CardTitle className="flex items-center gap-3 text-lg sm:text-xl">
+                <Bell className="h-5 w-5 sm:h-6 sm:w-6 text-orange-600" />
                 Important Notices
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-6">
-              <div className="space-y-4">
+            <CardContent className="p-4 sm:p-6">
+              <div className="space-y-3 sm:space-y-4">
                 {importantAnnouncements.map((announcement, index) => (
-                  <div key={index} className="p-4 rounded-xl border hover:shadow-md transition-shadow">
+                  <div key={index} className="p-3 sm:p-4 rounded-xl border hover:shadow-md transition-shadow">
                     <div className="flex items-start justify-between mb-2">
-                      <h4 className="font-semibold text-slate-800 text-sm">{announcement.title}</h4>
+                      <h4 className="font-semibold text-slate-800 text-sm truncate pr-2">{announcement.title}</h4>
                       <Badge
                         variant={announcement.priority === "high" ? "destructive" : "secondary"}
-                        className="text-xs"
+                        className="text-xs shrink-0"
                       >
                         {announcement.priority}
                       </Badge>
                     </div>
-                    <p className="text-xs text-slate-600 mb-2">{announcement.content}</p>
+                    <p className="text-xs text-slate-600 mb-2 line-clamp-2">{announcement.content}</p>
                     <p className="text-xs text-slate-400">{announcement.time}</p>
                   </div>
                 ))}
@@ -286,16 +288,16 @@ export default function Dashboard({ student }: DashboardProps) {
       {/* Upcoming Events */}
       <Card className="shadow-lg border">
         <CardHeader className="border-b">
-          <CardTitle className="flex items-center gap-3">
-            <Calendar className="h-6 w-6 text-purple-600" />
+          <CardTitle className="flex items-center gap-3 text-lg sm:text-xl">
+            <Calendar className="h-5 w-5 sm:h-6 sm:w-6 text-purple-600" />
             Upcoming Academic Events
           </CardTitle>
         </CardHeader>
-        <CardContent className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <CardContent className="p-4 sm:p-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             {upcomingEvents.map((event, index) => (
-              <div key={index} className="p-4 rounded-xl border hover:shadow-md transition-all hover:scale-105">
-                <div className="flex items-center justify-between mb-3">
+              <div key={index} className="p-3 sm:p-4 rounded-xl border hover:shadow-md transition-all hover:scale-105">
+                <div className="flex items-center justify-between mb-2 sm:mb-3">
                   <Badge
                     variant={
                       event.type === "exam"
@@ -310,10 +312,10 @@ export default function Dashboard({ student }: DashboardProps) {
                   >
                     {event.type}
                   </Badge>
-                  {event.priority === "high" && <AlertCircle className="h-4 w-4 text-red-500" />}
+                  {event.priority === "high" && <AlertCircle className="h-3 w-3 sm:h-4 sm:w-4 text-red-500" />}
                 </div>
-                <h4 className="font-semibold text-slate-800 mb-2">{event.title}</h4>
-                <p className="text-sm text-slate-500">
+                <h4 className="font-semibold text-slate-800 mb-2 text-sm sm:text-base line-clamp-2">{event.title}</h4>
+                <p className="text-xs sm:text-sm text-slate-500">
                   {new Date(event.date).toLocaleDateString("en-US", {
                     month: "short",
                     day: "numeric",
@@ -329,29 +331,29 @@ export default function Dashboard({ student }: DashboardProps) {
       {/* Performance Overview */}
       <Card className="shadow-lg border">
         <CardHeader className="border-b">
-          <CardTitle>Academic Performance Summary</CardTitle>
+          <CardTitle className="text-lg sm:text-xl">Academic Performance Summary</CardTitle>
         </CardHeader>
-        <CardContent className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="text-center p-6 rounded-xl bg-green-50 border border-green-200">
-              <div className="text-4xl font-bold text-green-600 mb-2">
+        <CardContent className="p-4 sm:p-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            <div className="text-center p-4 sm:p-6 rounded-xl bg-green-50 border border-green-200">
+              <div className="text-2xl sm:text-4xl font-bold text-green-600 mb-1 sm:mb-2">
                 {attendanceRecords.filter((r) => r.status === "Good").length}
               </div>
-              <p className="text-sm text-green-700 font-medium">Subjects with Good Attendance</p>
+              <p className="text-xs sm:text-sm text-green-700 font-medium">Subjects with Good Attendance</p>
             </div>
-            <div className="text-center p-6 rounded-xl bg-blue-50 border border-blue-200">
-              <div className="text-4xl font-bold text-blue-600 mb-2">
+            <div className="text-center p-4 sm:p-6 rounded-xl bg-blue-50 border border-blue-200">
+              <div className="text-2xl sm:text-4xl font-bold text-blue-600 mb-1 sm:mb-2">
                 {internalMarks.filter((m) => m.percentage >= 80).length}
               </div>
-              <p className="text-sm text-blue-700 font-medium">Subjects Above 80%</p>
+              <p className="text-xs sm:text-sm text-blue-700 font-medium">Subjects Above 80%</p>
             </div>
-            <div className="text-center p-6 rounded-xl bg-purple-50 border border-purple-200">
-              <div className="text-4xl font-bold text-purple-600 mb-2">{achievements.length}</div>
-              <p className="text-sm text-purple-700 font-medium">Total Achievements</p>
+            <div className="text-center p-4 sm:p-6 rounded-xl bg-purple-50 border border-purple-200">
+              <div className="text-2xl sm:text-4xl font-bold text-purple-600 mb-1 sm:mb-2">{achievements.length}</div>
+              <p className="text-xs sm:text-sm text-purple-700 font-medium">Total Achievements</p>
             </div>
-            <div className="text-center p-6 rounded-xl bg-orange-50 border border-orange-200">
-              <div className="text-4xl font-bold text-orange-600 mb-2">{student.semester}</div>
-              <p className="text-sm text-orange-700 font-medium">Current Semester</p>
+            <div className="text-center p-4 sm:p-6 rounded-xl bg-orange-50 border border-orange-200">
+              <div className="text-2xl sm:text-4xl font-bold text-orange-600 mb-1 sm:mb-2">{student.semester}</div>
+              <p className="text-xs sm:text-sm text-orange-700 font-medium">Current Semester</p>
             </div>
           </div>
         </CardContent>
