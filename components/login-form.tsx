@@ -14,9 +14,10 @@ type LoginType = "student" | "faculty" | "parent" | null
 interface LoginFormProps {
   selectedLogin: LoginType
   onBack: () => void
+  onLogin: (registrationNumber: string) => void
 }
 
-export default function LoginForm({ selectedLogin, onBack }: LoginFormProps) {
+export default function LoginForm({ selectedLogin, onBack, onLogin }: LoginFormProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState({
     registrationNumber: "",
@@ -33,7 +34,14 @@ export default function LoginForm({ selectedLogin, onBack }: LoginFormProps) {
     e.preventDefault()
     setIsLoading(true)
     await new Promise((resolve) => setTimeout(resolve, 2000))
-    console.log("Login attempt:", { type: selectedLogin, data: formData })
+
+    // Simulate successful login
+    if (selectedLogin === "student" && formData.registrationNumber) {
+      onLogin(formData.registrationNumber)
+    } else if ((selectedLogin === "faculty" || selectedLogin === "parent") && formData.email) {
+      onLogin(formData.email)
+    }
+
     setIsLoading(false)
   }
 
@@ -74,7 +82,6 @@ export default function LoginForm({ selectedLogin, onBack }: LoginFormProps) {
         scale: 0.95,
         transition: { duration: 0.4, ease: [0.4, 0, 0.6, 1] },
       }}
-      className="w-full max-w-md mx-auto px-2"
       style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" }}
     >
       <Card className="shadow-xl border-0 relative overflow-hidden bg-white/95 backdrop-blur-sm">
@@ -90,7 +97,7 @@ export default function LoginForm({ selectedLogin, onBack }: LoginFormProps) {
           }}
         />
 
-        <CardHeader className="space-y-3 sm:space-y-4 relative z-10 p-4 sm:p-6">
+        <CardHeader className="space-y-4 relative z-10">
           <div className="flex items-center space-x-3">
             <motion.div
               whileHover={{ scale: 1.05 }}
@@ -110,7 +117,7 @@ export default function LoginForm({ selectedLogin, onBack }: LoginFormProps) {
               </Button>
             </motion.div>
             <motion.div
-              className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br ${loginOptions.find((opt) => opt.type === selectedLogin)?.color} flex items-center justify-center shadow-md`}
+              className={`w-10 h-10 rounded-lg bg-gradient-to-br ${loginOptions.find((opt) => opt.type === selectedLogin)?.color} flex items-center justify-center shadow-md`}
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.3, duration: 0.4 }}
@@ -119,7 +126,7 @@ export default function LoginForm({ selectedLogin, onBack }: LoginFormProps) {
               {(() => {
                 const option = loginOptions.find((opt) => opt.type === selectedLogin)
                 const IconComponent = option?.icon || GraduationCap
-                return <IconComponent className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                return <IconComponent className="w-5 h-5 text-white" />
               })()}
             </motion.div>
           </div>
@@ -128,17 +135,17 @@ export default function LoginForm({ selectedLogin, onBack }: LoginFormProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4, duration: 0.4 }}
           >
-            <CardTitle className="text-xl sm:text-2xl font-semibold text-slate-800">
+            <CardTitle className="text-2xl font-semibold text-slate-800">
               {loginOptions.find((opt) => opt.type === selectedLogin)?.title}
             </CardTitle>
-            <CardDescription className="text-slate-600 font-medium text-sm sm:text-base">
+            <CardDescription className="text-slate-600 font-medium">
               Enter your credentials to access the portal
             </CardDescription>
           </motion.div>
         </CardHeader>
 
-        <CardContent className="relative z-10 p-4 sm:p-6 pt-0">
-          <form onSubmit={handleLogin} className="space-y-4 sm:space-y-5">
+        <CardContent className="relative z-10">
+          <form onSubmit={handleLogin} className="space-y-5">
             {selectedLogin === "student" ? (
               <motion.div
                 className="space-y-2"
@@ -161,7 +168,7 @@ export default function LoginForm({ selectedLogin, onBack }: LoginFormProps) {
                   onChange={(e) => handleInputChange("registrationNumber", e.target.value)}
                   required
                   disabled={isLoading}
-                  className="h-10 sm:h-11 transition-all duration-200 focus:ring-2 focus:ring-blue-500 border font-medium text-sm sm:text-base"
+                  className="h-11 transition-all duration-200 focus:ring-2 focus:ring-blue-500 border font-medium"
                 />
               </motion.div>
             ) : (
@@ -186,7 +193,7 @@ export default function LoginForm({ selectedLogin, onBack }: LoginFormProps) {
                   onChange={(e) => handleInputChange("email", e.target.value)}
                   required
                   disabled={isLoading}
-                  className="h-10 sm:h-11 transition-all duration-200 focus:ring-2 focus:ring-blue-500 border font-medium text-sm sm:text-base"
+                  className="h-11 transition-all duration-200 focus:ring-2 focus:ring-blue-500 border font-medium"
                 />
               </motion.div>
             )}
@@ -213,7 +220,7 @@ export default function LoginForm({ selectedLogin, onBack }: LoginFormProps) {
                   onChange={(e) => handleInputChange("password", e.target.value)}
                   required
                   disabled={isLoading}
-                  className="h-10 sm:h-11 pr-12 transition-all duration-200 focus:ring-2 focus:ring-blue-500 border font-medium text-sm sm:text-base"
+                  className="h-11 pr-12 transition-all duration-200 focus:ring-2 focus:ring-blue-500 border font-medium"
                 />
                 <button
                   type="button"
@@ -292,7 +299,7 @@ export default function LoginForm({ selectedLogin, onBack }: LoginFormProps) {
                 <Button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full h-10 sm:h-11 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold relative overflow-hidden group shadow-md transition-all duration-300 text-sm sm:text-base"
+                  className="w-full h-11 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold relative overflow-hidden group shadow-md transition-all duration-300"
                 >
                   <motion.div
                     className="absolute inset-0 bg-white/10 transform -skew-x-12 -translate-x-full group-hover:translate-x-full"

@@ -6,11 +6,27 @@ import Image from "next/image"
 import { BubbleAnimations, FloatingParticles, BackgroundShapes } from "@/components/background-animations"
 import WelcomeScreen from "@/components/welcome-screen"
 import LoginForm from "@/components/login-form"
+import StudentPortal from "@/components/student-portal"
 
 type LoginType = "student" | "faculty" | "parent" | null
 
 export default function CollegeERPPortal() {
   const [selectedLogin, setSelectedLogin] = useState<LoginType>(null)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [userRegistrationNumber, setUserRegistrationNumber] = useState<string>("")
+
+  if (isLoggedIn && selectedLogin === "student") {
+    return (
+      <StudentPortal
+        registrationNumber={userRegistrationNumber}
+        onLogout={() => {
+          setIsLoggedIn(false)
+          setSelectedLogin(null)
+          setUserRegistrationNumber("")
+        }}
+      />
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/40 to-indigo-50 overflow-hidden relative">
@@ -20,7 +36,7 @@ export default function CollegeERPPortal() {
       <BubbleAnimations />
       <div className="absolute inset-0 bg-grid-slate-200/20 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.5))]" />
 
-      <div className="relative min-h-screen flex flex-col lg:flex-row">
+      <div className="relative min-h-screen flex">
         {/* Left Side - College Image */}
         <motion.div
           initial={{ x: -50, opacity: 0 }}
@@ -29,7 +45,7 @@ export default function CollegeERPPortal() {
             duration: 1,
             ease: [0.25, 0.46, 0.45, 0.94],
           }}
-          className="flex w-full h-40 sm:h-48 md:h-56 lg:w-1/2 lg:h-auto relative order-first lg:order-none"
+          className="hidden lg:flex lg:w-1/2 relative"
         >
           <div className="relative w-full h-full">
             <motion.div
@@ -43,24 +59,23 @@ export default function CollegeERPPortal() {
                 ease: [0.4, 0, 0.6, 1],
               }}
             />
-            <div className="absolute right-0 top-0 h-full w-8 bg-gradient-to-r from-transparent to-slate-50 z-20 hidden lg:block" />
-            <div className="absolute bottom-0 left-0 w-full h-8 bg-gradient-to-t from-slate-50 to-transparent z-20 block lg:hidden" />
+            <div className="absolute right-0 top-0 h-full w-8 bg-gradient-to-r from-transparent to-slate-50 z-20" />
             <div className="relative w-full h-full overflow-hidden">
               <Image
                 src="https://ik.imagekit.io/kfeapecpv/Screenshot%202025-06-15%20110729.jpg?updatedAt=1749966299413"
                 alt="Loyola ICAM College of Engineering and Technology"
                 fill
-                className="object-cover object-top lg:object-center"
+                className="object-cover object-center"
                 priority
                 quality={90}
-                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 100vw, 50vw"
+                sizes="50vw"
               />
             </div>
           </div>
         </motion.div>
 
         {/* Right Side - Login Content */}
-        <div className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-12 relative min-h-screen lg:min-h-auto order-last lg:order-none">
+        <div className="flex-1 flex items-center justify-center p-6 lg:p-12 relative">
           {/* Creative Background Elements for Right Side */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
             {/* Geometric Grid Pattern */}
@@ -241,7 +256,14 @@ export default function CollegeERPPortal() {
               {!selectedLogin ? (
                 <WelcomeScreen onSelectLogin={setSelectedLogin} />
               ) : (
-                <LoginForm selectedLogin={selectedLogin} onBack={() => setSelectedLogin(null)} />
+                <LoginForm
+                  selectedLogin={selectedLogin}
+                  onBack={() => setSelectedLogin(null)}
+                  onLogin={(regNumber) => {
+                    setUserRegistrationNumber(regNumber)
+                    setIsLoggedIn(true)
+                  }}
+                />
               )}
             </AnimatePresence>
           </div>
