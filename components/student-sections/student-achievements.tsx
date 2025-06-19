@@ -12,13 +12,11 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Progress } from "@/components/ui/progress"
 import {
   Trophy,
   Award,
   Medal,
   Star,
-  Download,
   Calendar,
   Plus,
   Trash2,
@@ -26,7 +24,6 @@ import {
   Filter,
   Search,
   TrendingUp,
-  Target,
   Zap,
   Crown,
   CheckCircle,
@@ -37,37 +34,37 @@ interface StudentAchievementsProps {
   registrationNumber: string
 }
 
-// Enhanced Classic Confetti Animation with More Particles
+// Enhanced Classic Confetti Animation
 const ClassicConfettiCelebration = ({ isVisible, onComplete }: { isVisible: boolean; onComplete: () => void }) => {
   if (!isVisible) return null
 
-  // Main confetti pieces - increased count for more spectacular effect
+  // Main confetti pieces
   const confettiPieces = Array.from({ length: 120 }, (_, i) => ({
     id: i,
     color: [
-      "#ff6b6b", // Red
-      "#4ecdc4", // Teal
-      "#45b7d1", // Blue
-      "#f9ca24", // Yellow
-      "#f0932b", // Orange
-      "#eb4d4b", // Dark Red
-      "#6c5ce7", // Purple
-      "#a29bfe", // Light Purple
-      "#fd79a8", // Pink
-      "#00b894", // Green
-      "#00cec9", // Cyan
-      "#e17055", // Coral
-      "#74b9ff", // Light Blue
-      "#fd63a3", // Hot Pink
-      "#fdcb6e", // Light Orange
+      "#ff6b6b",
+      "#4ecdc4",
+      "#45b7d1",
+      "#f9ca24",
+      "#f0932b",
+      "#eb4d4b",
+      "#6c5ce7",
+      "#a29bfe",
+      "#fd79a8",
+      "#00b894",
+      "#00cec9",
+      "#e17055",
+      "#74b9ff",
+      "#fd63a3",
+      "#fdcb6e",
     ][i % 15],
     delay: Math.random() * 1.2,
     duration: 2.5 + Math.random() * 2,
     x: Math.random() * 100,
     rotation: Math.random() * 360,
     size: 6 + Math.random() * 8,
-    shape: i % 6, // 6 different shapes
-    drift: (Math.random() - 0.5) * 120, // Side drift amount
+    shape: i % 6,
+    drift: (Math.random() - 0.5) * 120,
   }))
 
   // Additional burst confetti from center
@@ -85,7 +82,7 @@ const ClassicConfettiCelebration = ({ isVisible, onComplete }: { isVisible: bool
       "#74b9ff",
       "#fdcb6e",
     ][i % 10],
-    angle: i * 9 + Math.random() * 20, // Spread in all directions
+    angle: i * 9 + Math.random() * 20,
     distance: 100 + Math.random() * 150,
     delay: Math.random() * 0.5,
     duration: 2 + Math.random() * 1.5,
@@ -536,6 +533,7 @@ export default function StudentAchievements({ registrationNumber }: StudentAchie
   const [achievements, setAchievements] = useState(getAchievements(registrationNumber))
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [showCelebration, setShowCelebration] = useState(false)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [filterCategory, setFilterCategory] = useState("all")
   const [sortBy, setSortBy] = useState("date")
@@ -610,7 +608,14 @@ export default function StudentAchievements({ registrationNumber }: StudentAchie
   }
 
   const handleDeleteAchievement = (id: string) => {
-    setAchievements(achievements.filter((achievement) => achievement.id !== id))
+    // Set the deleting ID to trigger card-specific animation
+    setDeletingId(id)
+
+    // Remove achievement after animation completes
+    setTimeout(() => {
+      setAchievements(achievements.filter((achievement) => achievement.id !== id))
+      setDeletingId(null)
+    }, 600)
   }
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -651,13 +656,147 @@ export default function StudentAchievements({ registrationNumber }: StudentAchie
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative">
       {/* Spectacular Confetti Celebration Animation */}
       <AnimatePresence>
         {showCelebration && (
           <ClassicConfettiCelebration isVisible={showCelebration} onComplete={() => setShowCelebration(false)} />
         )}
       </AnimatePresence>
+
+      {/* Floating Add Button - Mobile & Desktop */}
+      {/* Floating Add Button - Small & Static with Hover Tooltip */}
+      <div className="fixed bottom-6 right-6 z-50">
+        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+          <DialogTrigger asChild>
+            <div className="relative group">
+              <button className="w-12 h-12 bg-purple-600 hover:bg-purple-700 text-white rounded-full shadow-lg flex items-center justify-center transition-colors duration-200">
+                <Plus className="w-5 h-5" />
+              </button>
+
+              {/* Hover Tooltip */}
+              <div className="absolute right-full mr-3 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+                <div className="bg-slate-800 text-white text-sm px-3 py-2 rounded-lg whitespace-nowrap shadow-lg">
+                  Add Achievement
+                  {/* Arrow pointing to button */}
+                  <div className="absolute left-full top-1/2 transform -translate-y-1/2 border-4 border-transparent border-l-slate-800"></div>
+                </div>
+              </div>
+            </div>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto mx-4">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Trophy className="h-5 w-5 text-yellow-500" />
+                Add New Achievement
+              </DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="title">Achievement Title *</Label>
+                <Input
+                  id="title"
+                  value={newAchievement.title}
+                  onChange={(e) => setNewAchievement({ ...newAchievement, title: e.target.value })}
+                  placeholder="Enter achievement title"
+                  className="border-2"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="description">Description *</Label>
+                <Textarea
+                  id="description"
+                  value={newAchievement.description}
+                  onChange={(e) => setNewAchievement({ ...newAchievement, description: e.target.value })}
+                  placeholder="Describe your achievement in detail"
+                  className="border-2 min-h-[100px]"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="category">Category *</Label>
+                  <Select
+                    value={newAchievement.category}
+                    onValueChange={(value) => setNewAchievement({ ...newAchievement, category: value })}
+                  >
+                    <SelectTrigger className="border-2">
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Academic">Academic</SelectItem>
+                      <SelectItem value="Sports">Sports</SelectItem>
+                      <SelectItem value="Cultural">Cultural</SelectItem>
+                      <SelectItem value="Technical">Technical</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="level">Level</Label>
+                  <Select
+                    value={newAchievement.level}
+                    onValueChange={(value) => setNewAchievement({ ...newAchievement, level: value })}
+                  >
+                    <SelectTrigger className="border-2">
+                      <SelectValue placeholder="Select level" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="college">College Level</SelectItem>
+                      <SelectItem value="district">District Level</SelectItem>
+                      <SelectItem value="state">State Level</SelectItem>
+                      <SelectItem value="national">National Level</SelectItem>
+                      <SelectItem value="international">International Level</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="date">Date *</Label>
+                <Input
+                  id="date"
+                  type="date"
+                  value={newAchievement.date}
+                  onChange={(e) => setNewAchievement({ ...newAchievement, date: e.target.value })}
+                  className="border-2"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="certificate">Certificate/Document</Label>
+                <div className="border-2 border-dashed border-slate-300 rounded-lg p-4 text-center hover:border-purple-400 transition-colors">
+                  <input
+                    id="certificate"
+                    type="file"
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    onChange={handleFileUpload}
+                    className="hidden"
+                  />
+                  <label htmlFor="certificate" className="cursor-pointer">
+                    <Upload className="h-8 w-8 text-slate-400 mx-auto mb-2" />
+                    <p className="text-sm text-slate-600">
+                      {newAchievement.certificateFile
+                        ? newAchievement.certificateFile.name
+                        : "Click to upload certificate"}
+                    </p>
+                    <p className="text-xs text-slate-400 mt-1">PDF, JPG, PNG (Max 5MB)</p>
+                  </label>
+                </div>
+              </div>
+
+              <Button
+                onClick={handleAddAchievement}
+                className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700"
+              >
+                <Trophy className="h-4 w-4 mr-2" />
+                Add Achievement
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
 
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
@@ -686,129 +825,19 @@ export default function StudentAchievements({ registrationNumber }: StudentAchie
               <div className="text-2xl font-bold text-purple-600">{achievements.length}</div>
               <div className="text-sm text-slate-500">Total Achievements</div>
             </div>
-            <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-              <DialogTrigger asChild>
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Button className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 shadow-lg">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Achievement
-                  </Button>
-                </motion.div>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle className="flex items-center gap-2">
-                    <Trophy className="h-5 w-5 text-yellow-500" />
-                    Add New Achievement
-                  </DialogTitle>
-                </DialogHeader>
-                <div className="space-y-4 py-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="title">Achievement Title *</Label>
-                    <Input
-                      id="title"
-                      value={newAchievement.title}
-                      onChange={(e) => setNewAchievement({ ...newAchievement, title: e.target.value })}
-                      placeholder="Enter achievement title"
-                      className="border-2"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="description">Description *</Label>
-                    <Textarea
-                      id="description"
-                      value={newAchievement.description}
-                      onChange={(e) => setNewAchievement({ ...newAchievement, description: e.target.value })}
-                      placeholder="Describe your achievement in detail"
-                      className="border-2 min-h-[100px]"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="category">Category *</Label>
-                      <Select
-                        value={newAchievement.category}
-                        onValueChange={(value) => setNewAchievement({ ...newAchievement, category: value })}
-                      >
-                        <SelectTrigger className="border-2">
-                          <SelectValue placeholder="Select category" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Academic">Academic</SelectItem>
-                          <SelectItem value="Sports">Sports</SelectItem>
-                          <SelectItem value="Cultural">Cultural</SelectItem>
-                          <SelectItem value="Technical">Technical</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="level">Level</Label>
-                      <Select
-                        value={newAchievement.level}
-                        onValueChange={(value) => setNewAchievement({ ...newAchievement, level: value })}
-                      >
-                        <SelectTrigger className="border-2">
-                          <SelectValue placeholder="Select level" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="college">College Level</SelectItem>
-                          <SelectItem value="district">District Level</SelectItem>
-                          <SelectItem value="state">State Level</SelectItem>
-                          <SelectItem value="national">National Level</SelectItem>
-                          <SelectItem value="international">International Level</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="date">Date *</Label>
-                    <Input
-                      id="date"
-                      type="date"
-                      value={newAchievement.date}
-                      onChange={(e) => setNewAchievement({ ...newAchievement, date: e.target.value })}
-                      className="border-2"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="certificate">Certificate/Document</Label>
-                    <div className="border-2 border-dashed border-slate-300 rounded-lg p-4 text-center hover:border-purple-400 transition-colors">
-                      <input
-                        id="certificate"
-                        type="file"
-                        accept=".pdf,.jpg,.jpeg,.png"
-                        onChange={handleFileUpload}
-                        className="hidden"
-                      />
-                      <label htmlFor="certificate" className="cursor-pointer">
-                        <Upload className="h-8 w-8 text-slate-400 mx-auto mb-2" />
-                        <p className="text-sm text-slate-600">
-                          {newAchievement.certificateFile
-                            ? newAchievement.certificateFile.name
-                            : "Click to upload certificate"}
-                        </p>
-                        <p className="text-xs text-slate-400 mt-1">PDF, JPG, PNG (Max 5MB)</p>
-                      </label>
-                    </div>
-                  </div>
-
-                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                    <Button
-                      onClick={handleAddAchievement}
-                      className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700"
-                    >
-                      <Trophy className="h-4 w-4 mr-2" />
+            {/* Desktop Add Button */}
+            <div className="hidden sm:block">
+              <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+                <DialogTrigger asChild>
+                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                    <Button className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 shadow-lg">
+                      <Plus className="h-4 w-4 mr-2" />
                       Add Achievement
                     </Button>
                   </motion.div>
-                </div>
-              </DialogContent>
-            </Dialog>
+                </DialogTrigger>
+              </Dialog>
+            </div>
           </div>
         </div>
       </motion.div>
@@ -932,39 +961,7 @@ export default function StudentAchievements({ registrationNumber }: StudentAchie
         </Card>
       </motion.div>
 
-      {/* Achievement Progress */}
-      {achievements.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-        >
-          <Card className="border-2 bg-gradient-to-r from-yellow-50 to-orange-50">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Target className="h-5 w-5 text-orange-600" />
-                Achievement Progress
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Progress to next milestone (10 achievements)</span>
-                  <span className="text-sm text-slate-600">{achievements.length}/10</span>
-                </div>
-                <Progress value={(achievements.length / 10) * 100} className="h-3" />
-                <p className="text-xs text-slate-600">
-                  {10 - achievements.length > 0
-                    ? `${10 - achievements.length} more achievements to reach your next milestone!`
-                    : "Congratulations! You've reached the milestone!"}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-      )}
-
-      {/* Achievements List */}
+      {/* Achievements List with Enhanced Card Animations */}
       {filteredAchievements.length > 0 ? (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -979,72 +976,190 @@ export default function StudentAchievements({ registrationNumber }: StudentAchie
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {filteredAchievements.map((achievement, index) => {
-                  const Icon = getCategoryIcon(achievement.category)
-                  const levelInfo = getLevelBadge(achievement.level || "college")
+              <motion.div layout className="space-y-4">
+                <AnimatePresence mode="popLayout">
+                  {filteredAchievements.map((achievement, index) => {
+                    const Icon = getCategoryIcon(achievement.category)
+                    const levelInfo = getLevelBadge(achievement.level || "college")
+                    const isDeleting = deletingId === achievement.id
 
-                  return (
-                    <motion.div
-                      key={achievement.id}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.3, delay: index * 0.1 }}
-                      className="p-4 rounded-xl border-2 hover:shadow-lg transition-all duration-300 group hover:scale-[1.02] bg-gradient-to-r from-white to-slate-50/50"
-                    >
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-start gap-4 flex-1">
-                          <motion.div
-                            className={`p-3 rounded-xl border-2 ${getCategoryColor(achievement.category)} group-hover:scale-110 transition-transform duration-300`}
-                            whileHover={{ rotate: 10 }}
-                          >
-                            <Icon className="h-6 w-6" />
-                          </motion.div>
-                          <div className="flex-1 min-w-0">
-                            <h3 className="font-semibold text-slate-800 text-lg group-hover:text-purple-600 transition-colors mb-2">
-                              {achievement.title}
-                            </h3>
-                            <p className="text-sm text-slate-600 mb-3 leading-relaxed">{achievement.description}</p>
-                            <div className="flex flex-wrap items-center gap-3">
-                              <div className="flex items-center gap-1 text-sm text-slate-500">
-                                <Calendar className="h-4 w-4" />
-                                {new Date(achievement.date).toLocaleDateString()}
+                    return (
+                      <motion.div
+                        key={achievement.id}
+                        layout
+                        initial={{
+                          opacity: 0,
+                          scale: 0.8,
+                          y: 50,
+                          rotateX: -15,
+                        }}
+                        animate={{
+                          opacity: isDeleting ? 0.3 : 1,
+                          scale: isDeleting ? 0.95 : 1,
+                          y: 0,
+                          rotateX: 0,
+                          filter: isDeleting ? "blur(2px)" : "blur(0px)",
+                        }}
+                        exit={{
+                          opacity: 0,
+                          scale: 0.8,
+                          x: -100,
+                          rotateY: -15,
+                          filter: "blur(4px)",
+                          transition: {
+                            duration: 0.4,
+                            ease: "easeInOut",
+                          },
+                        }}
+                        whileHover={{
+                          scale: isDeleting ? 0.95 : 1.02,
+                          y: isDeleting ? 0 : -2,
+                          transition: { duration: 0.2 },
+                        }}
+                        transition={{
+                          duration: 0.5,
+                          delay: index * 0.1,
+                          layout: { duration: 0.3 },
+                        }}
+                        className={`p-4 rounded-xl border-2 transition-all duration-300 group bg-gradient-to-r from-white to-slate-50/50 ${
+                          isDeleting
+                            ? "shadow-none border-red-200 bg-red-50/30"
+                            : "hover:shadow-lg hover:border-purple-200"
+                        }`}
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="flex items-start gap-4 flex-1">
+                            <motion.div
+                              className={`p-3 rounded-xl border-2 ${getCategoryColor(achievement.category)} transition-transform duration-300 ${
+                                isDeleting ? "scale-90 opacity-50" : "group-hover:scale-110"
+                              }`}
+                              whileHover={isDeleting ? {} : { rotate: 10 }}
+                              animate={
+                                isDeleting
+                                  ? {
+                                      rotate: [0, -5, 5, -5, 0],
+                                      scale: [1, 0.9, 0.9, 0.9, 0.9],
+                                    }
+                                  : {}
+                              }
+                              transition={
+                                isDeleting
+                                  ? {
+                                      duration: 0.5,
+                                      repeat: 1,
+                                    }
+                                  : {}
+                              }
+                            >
+                              <Icon className="h-6 w-6" />
+                            </motion.div>
+                            <div className="flex-1 min-w-0">
+                              <motion.h3
+                                className={`font-semibold text-lg mb-2 transition-colors ${
+                                  isDeleting
+                                    ? "text-slate-400 line-through"
+                                    : "text-slate-800 group-hover:text-purple-600"
+                                }`}
+                                animate={
+                                  isDeleting
+                                    ? {
+                                        opacity: [1, 0.5, 0.5, 0.5],
+                                      }
+                                    : {}
+                                }
+                              >
+                                {achievement.title}
+                              </motion.h3>
+                              <motion.p
+                                className={`text-sm mb-3 leading-relaxed transition-colors ${
+                                  isDeleting ? "text-slate-400" : "text-slate-600"
+                                }`}
+                                animate={
+                                  isDeleting
+                                    ? {
+                                        opacity: [1, 0.4, 0.4, 0.4],
+                                      }
+                                    : {}
+                                }
+                              >
+                                {achievement.description}
+                              </motion.p>
+                              <div className="flex flex-wrap items-center gap-3">
+                                <div
+                                  className={`flex items-center gap-1 text-sm transition-colors ${
+                                    isDeleting ? "text-slate-400" : "text-slate-500"
+                                  }`}
+                                >
+                                  <Calendar className="h-4 w-4" />
+                                  {new Date(achievement.date).toLocaleDateString()}
+                                </div>
+                                <motion.div animate={isDeleting ? { opacity: 0.4, scale: 0.9 } : {}}>
+                                  <Badge variant="outline" className="border-2">
+                                    {achievement.category}
+                                  </Badge>
+                                </motion.div>
+                                <motion.div animate={isDeleting ? { opacity: 0.4, scale: 0.9 } : {}}>
+                                  <Badge className={`${levelInfo.color} border-2`}>{levelInfo.label}</Badge>
+                                </motion.div>
+                                {achievement.certificateFile && (
+                                  <motion.div animate={isDeleting ? { opacity: 0.4, scale: 0.9 } : {}}>
+                                    <Badge variant="secondary" className="border-2">
+                                      Certificate Available
+                                    </Badge>
+                                  </motion.div>
+                                )}
                               </div>
-                              <Badge variant="outline" className="border-2">
-                                {achievement.category}
-                              </Badge>
-                              <Badge className={`${levelInfo.color} border-2`}>{levelInfo.label}</Badge>
-                              {achievement.certificateFile && (
-                                <Badge variant="secondary" className="border-2">
-                                  Certificate Available
-                                </Badge>
-                              )}
                             </div>
                           </div>
-                        </div>
-                        <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity ml-4">
-                          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-                            <Button variant="outline" size="sm" className="border-2">
-                              <Download className="h-4 w-4 mr-2" />
-                              Certificate
-                            </Button>
-                          </motion.div>
-                          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleDeleteAchievement(achievement.id)}
-                              className="text-red-600 hover:text-red-700 hover:bg-red-50 border-2 border-red-200"
+                          <div
+                            className={`flex items-center gap-2 ml-4 transition-opacity ${
+                              isDeleting ? "opacity-30" : "opacity-0 group-hover:opacity-100"
+                            }`}
+                          >
+                            <motion.div
+                              whileHover={isDeleting ? {} : { scale: 1.1 }}
+                              whileTap={isDeleting ? {} : { scale: 0.9 }}
                             >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </motion.div>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => !isDeleting && handleDeleteAchievement(achievement.id)}
+                                disabled={isDeleting}
+                                className={`border-2 transition-all ${
+                                  isDeleting
+                                    ? "text-red-400 border-red-200 cursor-not-allowed"
+                                    : "text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+                                }`}
+                              >
+                                <motion.div
+                                  animate={
+                                    isDeleting
+                                      ? {
+                                          rotate: [0, 10, -10, 10, 0],
+                                          scale: [1, 1.1, 1.1, 1.1, 1],
+                                        }
+                                      : {}
+                                  }
+                                  transition={
+                                    isDeleting
+                                      ? {
+                                          duration: 0.6,
+                                          repeat: 1,
+                                        }
+                                      : {}
+                                  }
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </motion.div>
+                              </Button>
+                            </motion.div>
+                          </div>
                         </div>
-                      </div>
-                    </motion.div>
-                  )
-                })}
-              </div>
+                      </motion.div>
+                    )
+                  })}
+                </AnimatePresence>
+              </motion.div>
             </CardContent>
           </Card>
         </motion.div>

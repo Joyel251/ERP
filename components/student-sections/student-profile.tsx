@@ -23,6 +23,10 @@ import {
   Award,
   Building,
   AlertCircle,
+  BookOpen,
+  Trophy,
+  Target,
+  School,
 } from "lucide-react"
 import type { Student } from "@/lib/student-data"
 
@@ -35,19 +39,61 @@ export default function StudentProfile({ student }: StudentProfileProps) {
     { label: "Full Name", value: student.name, icon: User, color: "blue" },
     { label: "Roll Number", value: student.rollNumber, icon: GraduationCap, color: "green" },
     { label: "Registration Number", value: student.registrationNumber, icon: GraduationCap, color: "green" },
+    { label: "Mode", value: student.mode, icon: School, color: "purple" },
+    { label: "Branch", value: student.department, icon: Building, color: "indigo" },
+    { label: "Email ID of Student", value: student.studentEmail, icon: Mail, color: "blue" },
+    { label: "Mobile No of Student", value: student.studentContactNo, icon: Phone, color: "green" },
     {
       label: "Date of Birth",
       value: new Date(student.dateOfBirth).toLocaleDateString(),
       icon: Calendar,
       color: "purple",
     },
-    { label: "Gender", value: student.gender, icon: UserCheck, color: "pink" },
-    { label: "Blood Group", value: student.bloodGroup, icon: Heart, color: "red" },
-    { label: "Community", value: student.community, icon: Users, color: "orange" },
-    { label: "Nationality", value: student.nationality, icon: Globe, color: "indigo" },
+    { label: "Total Marks", value: student.totalMarks, icon: Target, color: "orange" },
+    { label: "Overall Percentage", value: student.overallPercentage, icon: Award, color: "yellow" },
+    { label: "Cut-off Marks", value: student.cutoffMarks, icon: Star, color: "pink" },
+    {
+      label: "Date of Joining",
+      value: new Date(student.dateOfJoining).toLocaleDateString(),
+      icon: Calendar,
+      color: "cyan",
+    },
+    {
+      label: "Day Scholar/Hosteller",
+      value: student.hosteller === "Yes" ? "Hosteller" : "Day Scholar",
+      icon: Home,
+      color: "indigo",
+    },
+    { label: "Management/Counseling", value: student.managementCounseling, icon: BookOpen, color: "teal" },
+    { label: "First Graduate (Y/N)", value: student.firstGraduate, icon: Trophy, color: "yellow" },
+    { label: "State", value: student.state, icon: MapPin, color: "red" },
     { label: "Religion", value: student.religion, icon: Globe, color: "indigo" },
-    { label: "District", value: student.district, icon: MapPin, color: "teal" },
+    { label: "Community", value: student.community, icon: Users, color: "orange" },
+    { label: "Sub Caste", value: student.subCaste, icon: Users, color: "purple" },
+    { label: "Sex", value: student.gender, icon: UserCheck, color: "pink" },
+    { label: "Blood Group", value: student.bloodGroup, icon: Heart, color: "red" },
+    { label: "Mother Tongue", value: student.motherTongue, icon: Globe, color: "blue" },
+    { label: "Native Place", value: student.nativePlace, icon: MapPin, color: "green" },
+    { label: "Nationality", value: student.nationality, icon: Globe, color: "indigo" },
   ]
+
+  // Add Catholic Parish if applicable
+  if (student.catholicParish) {
+    personalInfo.splice(17, 0, {
+      label: "Catholic Parish",
+      value: student.catholicParish,
+      icon: Building,
+      color: "purple",
+    })
+  }
+
+  // Add Dalit Catholic status
+  personalInfo.splice(student.catholicParish ? 18 : 17, 0, {
+    label: "Dalit Catholic (Y/N)",
+    value: student.dalitCatholic,
+    icon: Users,
+    color: "orange",
+  })
 
   const academicInfo = [
     { label: "Course", value: student.course, icon: Award, color: "blue" },
@@ -63,7 +109,6 @@ export default function StudentProfile({ student }: StudentProfileProps) {
       icon: Calendar,
       color: "pink",
     },
-    { label: "Hosteller", value: student.hosteller, icon: Home, color: "indigo" },
   ]
 
   const contactInfo = [
@@ -80,6 +125,16 @@ export default function StudentProfile({ student }: StudentProfileProps) {
     { label: "Annual Income", value: student.annualIncome, icon: DollarSign, color: "yellow" },
     { label: "Parent Contact No", value: student.parentContactNo, icon: Phone, color: "orange" },
     { label: "Parent Email", value: student.parentEmail, icon: Mail, color: "cyan" },
+  ]
+
+  const schoolActivities = [
+    { label: "Co-Curricular Activities in School", value: student.coCurricularActivities, icon: Trophy, color: "blue" },
+    {
+      label: "Extra-Curricular Activities in School",
+      value: student.extraCurricularActivities,
+      icon: Star,
+      color: "purple",
+    },
   ]
 
   const getColorClasses = (color: string) => {
@@ -404,13 +459,59 @@ export default function StudentProfile({ student }: StudentProfileProps) {
               </Card>
             </motion.div>
           </div>
+
+          {/* School Activities */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.6 }}
+          >
+            <Card className="border-2 border-slate-100 shadow-lg">
+              <CardHeader className="bg-gradient-to-r from-yellow-50 to-orange-50 border-b border-slate-100">
+                <CardTitle className="flex items-center gap-3 text-xl">
+                  <div className="p-2 rounded-xl bg-yellow-500 text-white">
+                    <Trophy className="h-5 w-5" />
+                  </div>
+                  School Activities
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {schoolActivities.map((info, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      className="group"
+                    >
+                      <div className="flex items-start gap-4 p-4 rounded-xl border border-slate-100 hover:border-slate-200 hover:shadow-md transition-all duration-300 bg-white hover:bg-slate-50/50">
+                        <div
+                          className={`p-3 rounded-xl border ${getColorClasses(info.color)} group-hover:scale-110 transition-transform duration-300`}
+                        >
+                          <info.icon className="h-5 w-5" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-xs text-slate-500 uppercase tracking-wider font-semibold mb-1">
+                            {info.label}
+                          </p>
+                          <p className="text-sm font-semibold text-slate-800 leading-relaxed">{info.value}</p>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
         </div>
       </div>
+
       {/* Information Note */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.6 }}
+        transition={{ duration: 0.5, delay: 0.7 }}
         className="mt-8"
       >
         <Card className="border-2 border-amber-100 bg-amber-50/50">
