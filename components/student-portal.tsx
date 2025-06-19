@@ -17,7 +17,6 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import {
   LogOut,
   Home,
@@ -33,7 +32,6 @@ import {
   AlertTriangle,
   Bell,
   Edit,
-  X,
 } from "lucide-react"
 import { getStudentData, type Student } from "@/lib/student-data"
 import StudentProfile from "@/components/student-sections/student-profile"
@@ -343,7 +341,7 @@ function AppSidebar({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            {/* Mobile Close Button and College Info */}
+            {/* College Info and Mobile Sidebar Toggle */}
             <div className="flex items-center justify-between group-data-[collapsible=icon]:justify-center mb-3 sm:mb-4">
               <div className="flex items-center gap-2 sm:gap-3">
                 <motion.div
@@ -371,33 +369,16 @@ function AppSidebar({
                 </div>
               </div>
 
-              {/* Mobile Close Button - Only show on mobile when sidebar is expanded */}
-              {isMobile && state === "expanded" && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.3 }}
-                  className="group-data-[collapsible=icon]:hidden"
-                >
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setOpen(false)}
-                    className="h-8 w-8 p-0 hover:bg-slate-100 rounded-lg transition-colors"
-                  >
-                    <X className="h-4 w-4 text-slate-600" />
-                    <span className="sr-only">Close sidebar</span>
-                  </Button>
+              {/* Mobile Sidebar Toggle - Only show on mobile when sidebar is open */}
+              {isMobile && (
+                <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                  <SidebarTrigger className="h-8 w-8 p-0 hover:bg-slate-100 rounded-lg transition-colors md:hidden flex-shrink-0 border border-slate-200" />
                 </motion.div>
               )}
             </div>
 
             {/* Student Info Card */}
-            <motion.div
-              className="group-data-[collapsible=icon]:hidden"
-              animate={{ opacity: state === "expanded" ? 1 : 0 }}
-              transition={{ duration: 0.3 }}
-            >
+            <div className="md:group-data-[collapsible=icon]:hidden">
               <motion.div
                 className="relative p-2 sm:p-3 rounded-xl bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 border-2 border-blue-100/60 overflow-hidden"
                 whileHover={{ scale: 1.02 }}
@@ -457,7 +438,7 @@ function AppSidebar({
                   </div>
                 </div>
               </motion.div>
-            </motion.div>
+            </div>
           </motion.div>
         </SidebarHeader>
 
@@ -475,11 +456,7 @@ function AppSidebar({
                 transition={{ duration: 0.4, delay: categoryIndex * 0.1 }}
                 className="mb-4 sm:mb-6"
               >
-                <motion.div
-                  className="px-2 sm:px-3 mb-1 sm:mb-2 group-data-[collapsible=icon]:hidden"
-                  animate={{ opacity: state === "expanded" ? 1 : 0 }}
-                  transition={{ duration: 0.3 }}
-                >
+                <motion.div className="px-2 sm:px-3 mb-1 sm:mb-2 md:group-data-[collapsible=icon]:hidden">
                   <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{categoryLabel}</h3>
                 </motion.div>
 
@@ -540,7 +517,7 @@ function AppSidebar({
                               <item.icon className="h-4 w-4 sm:h-5 sm:w-5" />
                             </motion.div>
 
-                            <span className="font-medium text-xs sm:text-sm relative z-10 group-data-[collapsible=icon]:hidden truncate">
+                            <span className="font-medium text-xs sm:text-sm relative z-10 md:group-data-[collapsible=icon]:hidden truncate">
                               {item.label}
                             </span>
 
@@ -646,7 +623,7 @@ function AppSidebar({
                     <motion.div whileHover={{ rotate: 10 }} className="relative z-10 min-w-[16px] sm:min-w-[20px]">
                       <LogOut className="h-4 w-4 sm:h-5 sm:w-5" />
                     </motion.div>
-                    <span className="relative z-10 group-data-[collapsible=icon]:hidden text-xs sm:text-sm">
+                    <span className="relative z-10 md:group-data-[collapsible=icon]:hidden text-xs sm:text-sm">
                       Sign Out
                     </span>
                   </SidebarMenuButton>
