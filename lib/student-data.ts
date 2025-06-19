@@ -15,7 +15,7 @@ export interface Student {
   dateOfBirth: string
   admissionDate: string
   profileImage?: string
-  // New fields
+  // Enhanced profile fields
   course: string
   batch: string
   academicYear: string
@@ -35,6 +35,24 @@ export interface Student {
   religion: string
   hosteller: "Yes" | "No"
   district: string
+  // New comprehensive profile fields
+  // Mode of admission
+  mode: "Regular" | "Lateral Entry" | "Transfer"
+  // HSC (Higher Secondary Certificate) school information
+  totalMarks: string
+  overallPercentage: string
+  cutoffMarks: string
+  dateOfJoining: string
+  managementCounseling: "Management" | "Counseling"
+  firstGraduate: "Yes" | "No"
+  state: string
+  catholicParish?: string
+  dalitCatholic: "Yes" | "No"
+  subCaste: string
+  motherTongue: string
+  nativePlace: string
+  coCurricularActivities: string
+  extraCurricularActivities: string
 }
 
 export interface InternalMark {
@@ -113,6 +131,51 @@ export interface ArrearDetail {
   attempts: number
 }
 
+// New attendance interfaces
+export interface PeriodAttendance {
+  period: number | string
+  subject?: string
+  status: "present" | "absent" | "od"
+  type: "class" | "break" | "lunch"
+}
+
+export interface DayAttendance {
+  day: string
+  date: string
+  periods: PeriodAttendance[]
+}
+
+export interface SubjectAttendance {
+  name: string
+  code: string
+  present: number
+  total: number
+  percentage: number
+}
+
+export interface MainfileAttendance {
+  totalHours: number
+  presentHours: number
+  absentHours: number
+  odHours: number
+  percentage: number
+}
+
+export interface AttendanceData {
+  mainfile: MainfileAttendance
+  subjects: SubjectAttendance[]
+  weeklySchedule: DayAttendance[]
+}
+
+// Centralized subject data to ensure consistency
+const SUBJECTS = [
+  { name: "Data Structures", code: "CS301" },
+  { name: "Database Management", code: "CS302" },
+  { name: "Computer Networks", code: "CS303" },
+  { name: "Operating Systems", code: "CS304" },
+  { name: "Software Engineering", code: "CS305" },
+]
+
 // Mock data generator based on registration number
 export function getStudentData(registrationNumber: string): Student {
   const lastDigits = registrationNumber.slice(-2)
@@ -134,9 +197,13 @@ export function getStudentData(registrationNumber: string): Student {
   const departments = ["Computer Science", "Electronics", "Mechanical", "Civil", "Electrical"]
   const courses = ["B.E Computer Science", "B.E Electronics", "B.E Mechanical", "B.E Civil", "B.E Electrical"]
   const communities = ["OC", "BC", "MBC", "SC", "ST"]
+  const subCastes = ["Vanniyar", "Thevar", "Naidu", "Chettiar", "Gounder", "Mudaliar", "Pillai", "Reddy"]
   const religions = ["Hindu", "Christian", "Muslim", "Sikh", "Buddhist"]
   const districts = ["Chennai", "Coimbatore", "Madurai", "Salem", "Trichy", "Vellore", "Tirunelveli"]
+  const states = ["Tamil Nadu", "Karnataka", "Andhra Pradesh", "Kerala", "Telangana"]
   const genders = ["Male", "Female"]
+  const modes = ["Regular", "Lateral Entry", "Transfer"] // Admission modes
+  const motherTongues = ["Tamil", "Telugu", "Malayalam", "Kannada", "Hindi", "English"]
 
   const selectedName = names[studentNumber % names.length]
   const selectedDept = departments[studentNumber % departments.length]
@@ -181,21 +248,154 @@ export function getStudentData(registrationNumber: string): Student {
     religion: religions[studentNumber % religions.length],
     hosteller: studentNumber % 3 === 0 ? "Yes" : "No",
     district: districts[studentNumber % districts.length],
+    // New comprehensive fields
+    // Mode of admission
+    mode: modes[studentNumber % modes.length] as "Regular" | "Lateral Entry" | "Transfer",
+    // HSC (Higher Secondary Certificate) school information
+    totalMarks: `${450 + (studentNumber % 50)}`,
+    overallPercentage: `${85 + (studentNumber % 15)}.${studentNumber % 10}%`,
+    cutoffMarks: `${180 + (studentNumber % 20)}`,
+    dateOfJoining: `2020-07-${String((studentNumber % 30) + 1).padStart(2, "0")}`,
+    managementCounseling: studentNumber % 2 === 0 ? "Management" : "Counseling",
+    firstGraduate: studentNumber % 4 === 0 ? "Yes" : "No",
+    state: states[studentNumber % states.length],
+    catholicParish:
+      religions[studentNumber % religions.length] === "Christian"
+        ? `St. ${selectedName.split(" ")[0]} Parish`
+        : undefined,
+    dalitCatholic:
+      religions[studentNumber % religions.length] === "Christian" && studentNumber % 5 === 0 ? "Yes" : "No",
+    subCaste: subCastes[studentNumber % subCastes.length],
+    motherTongue: motherTongues[studentNumber % motherTongues.length],
+    nativePlace: `${districts[studentNumber % districts.length]}, ${states[studentNumber % states.length]}`,
+    coCurricularActivities: [
+      "School Cricket Team Captain",
+      "Science Club Secretary",
+      "Student Council Member",
+      "Debate Team Leader",
+      "Music Band Participant",
+    ][studentNumber % 5],
+    extraCurricularActivities: [
+      "National Level Swimming Competition",
+      "State Level Chess Championship",
+      "Inter-School Drama Competition",
+      "District Level Art Exhibition",
+      "Regional Science Fair Winner",
+    ][studentNumber % 5],
+  }
+}
+
+export function getAttendanceData(registrationNumber: string): AttendanceData {
+  const studentNumber = Number.parseInt(registrationNumber.slice(-2)) || 1
+  const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+
+  // Generate realistic weekly schedule with mixed attendance
+  const weeklySchedule: DayAttendance[] = days.map((day, dayIndex) => {
+    const periods: PeriodAttendance[] = []
+
+    // Add class periods (1-8) with realistic attendance patterns
+    for (let period = 1; period <= 8; period++) {
+      const randomFactor = (studentNumber + dayIndex * 8 + period) % 20
+      let status: "present" | "absent" | "od" = "present"
+
+      // Create realistic attendance patterns (not all present)
+      if (randomFactor < 3)
+        status = "absent" // 15% absent
+      else if (randomFactor < 4) status = "od" // 5% OD
+      // 80% present
+
+      periods.push({
+        period,
+        subject: SUBJECTS[period % SUBJECTS.length].name,
+        status,
+        type: "class",
+      })
+    }
+
+    return {
+      day,
+      date: `2024-01-${String(dayIndex + 15).padStart(2, "0")}`,
+      periods,
+    }
+  })
+
+  // Calculate mainfile attendance based on periods 1, 3, 6
+  let totalMainfileHours = 0
+  let presentMainfileHours = 0
+  let absentMainfileHours = 0
+  let odMainfileHours = 0
+
+  weeklySchedule.forEach((day) => {
+    // Period 1 affects periods 1-2
+    const period1 = day.periods.find((p) => p.period === 1)
+    if (period1) {
+      totalMainfileHours += 2
+      if (period1.status === "present") presentMainfileHours += 2
+      else if (period1.status === "absent") absentMainfileHours += 2
+      else if (period1.status === "od") odMainfileHours += 2
+    }
+
+    // Period 3 affects periods 3-5
+    const period3 = day.periods.find((p) => p.period === 3)
+    if (period3) {
+      totalMainfileHours += 3
+      if (period3.status === "present") presentMainfileHours += 3
+      else if (period3.status === "absent") absentMainfileHours += 3
+      else if (period3.status === "od") odMainfileHours += 3
+    }
+
+    // Period 6 affects periods 6-8
+    const period6 = day.periods.find((p) => p.period === 6)
+    if (period6) {
+      totalMainfileHours += 3
+      if (period6.status === "present") presentMainfileHours += 3
+      else if (period6.status === "absent") absentMainfileHours += 3
+      else if (period6.status === "od") odMainfileHours += 3
+    }
+  })
+
+  const mainfilePercentage = totalMainfileHours > 0 ? (presentMainfileHours / totalMainfileHours) * 100 : 0
+
+  // Calculate subject-wise attendance using consistent data
+  const subjectAttendance: SubjectAttendance[] = SUBJECTS.map((subject, subjectIndex) => {
+    let present = 0
+    let total = 0
+
+    // Generate consistent attendance data for each subject
+    for (let week = 0; week < 8; week++) {
+      for (let day = 0; day < 5; day++) {
+        const randomFactor = (studentNumber + week * 5 + day + subjectIndex) % 20
+        total++
+        if (randomFactor >= 3) present++ // Same logic as above: 85% attendance
+      }
+    }
+
+    return {
+      name: subject.name,
+      code: subject.code,
+      present,
+      total,
+      percentage: total > 0 ? (present / total) * 100 : 0,
+    }
+  })
+
+  return {
+    mainfile: {
+      totalHours: totalMainfileHours,
+      presentHours: presentMainfileHours,
+      absentHours: absentMainfileHours,
+      odHours: odMainfileHours,
+      percentage: mainfilePercentage,
+    },
+    subjects: subjectAttendance,
+    weeklySchedule,
   }
 }
 
 export function getInternalMarks(registrationNumber: string): InternalMark[] {
-  const subjects = [
-    { name: "Data Structures", code: "CS301" },
-    { name: "Database Management", code: "CS302" },
-    { name: "Computer Networks", code: "CS303" },
-    { name: "Operating Systems", code: "CS304" },
-    { name: "Software Engineering", code: "CS305" },
-  ]
-
   const studentNumber = Number.parseInt(registrationNumber.slice(-2)) || 1
 
-  return subjects.map((subject, index) => {
+  return SUBJECTS.map((subject, index) => {
     const base = 15 + ((studentNumber + index) % 10)
     const test1 = Math.min(20, base + Math.floor(Math.random() * 5))
     const test2 = Math.min(20, base + Math.floor(Math.random() * 5))
@@ -216,31 +416,19 @@ export function getInternalMarks(registrationNumber: string): InternalMark[] {
 }
 
 export function getAttendanceRecords(registrationNumber: string): AttendanceRecord[] {
-  const subjects = [
-    { name: "Data Structures", code: "CS301" },
-    { name: "Database Management", code: "CS302" },
-    { name: "Computer Networks", code: "CS303" },
-    { name: "Operating Systems", code: "CS304" },
-    { name: "Software Engineering", code: "CS305" },
-  ]
+  const attendanceData = getAttendanceData(registrationNumber)
 
-  const studentNumber = Number.parseInt(registrationNumber.slice(-2)) || 1
-
-  return subjects.map((subject, index) => {
-    const totalClasses = 45 + index * 5
-    const attendedClasses = Math.floor(totalClasses * (0.7 + (studentNumber % 20) / 100))
-    const percentage = (attendedClasses / totalClasses) * 100
-
+  return attendanceData.subjects.map((subject) => {
     let status: "Good" | "Average" | "Poor" = "Good"
-    if (percentage < 75) status = "Poor"
-    else if (percentage < 85) status = "Average"
+    if (subject.percentage < 75) status = "Poor"
+    else if (subject.percentage < 85) status = "Average"
 
     return {
       subject: subject.name,
       subjectCode: subject.code,
-      totalClasses,
-      attendedClasses,
-      percentage,
+      totalClasses: subject.total,
+      attendedClasses: subject.present,
+      percentage: subject.percentage,
       status,
     }
   })
